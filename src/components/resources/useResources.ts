@@ -84,7 +84,7 @@ export function useResourceList(
       setRows(data ?? []);
     }
     setLoading(false);
-  }, [client, levelId, teacherKey]);
+  }, [client, levelId, teacherKey, classId]);
 
 
   useEffect(() => {
