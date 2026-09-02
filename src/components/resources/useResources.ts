@@ -93,3 +93,28 @@ export function useResourceList(
 
   return { rows, loading, error, setError, reload: load };
 }
+
+export type ClassOption = { id: string; name: string; level_id: string | null };
+
+export function useTeacherClasses(client: SupabaseClient<Database>, teacherId: string) {
+  const [classes, setClasses] = useState<ClassOption[]>([]);
+  useEffect(() => {
+    let active = true;
+    void (async () => {
+      const { data } = await client
+        .from("teacher_classes")
+        .select("class_id, classes(id, name, level_id)")
+        .eq("teacher_id", teacherId);
+      if (!active) return;
+      const list = (data ?? [])
+        .map((r) => (r as { classes: ClassOption | null }).classes)
+        .filter((c): c is ClassOption => c !== null)
+        .sort((a, b) => a.name.localeCompare(b.name, "ar"));
+      setClasses(list);
+    })();
+    return () => {
+      active = false;
+    };
+  }, [client, teacherId]);
+  return classes;
+}
