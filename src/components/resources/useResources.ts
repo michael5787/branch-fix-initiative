@@ -57,6 +57,7 @@ export function useResourceList(
   client: SupabaseClient<Database>,
   levelId?: string | null,
   teacherIds?: string[] | null,
+  classId?: string | null,
 ) {
   const [rows, setRows] = useState<ResourceRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -75,6 +76,7 @@ export function useResourceList(
     let query = client.from("resources").select("*").order("created_at", { ascending: false });
     if (levelId) query = query.eq("level_id", levelId);
     if (teacherKey) query = query.in("teacher_id", teacherKey.split(","));
+    if (classId) query = query.or(`class_id.is.null,class_id.eq.${classId}`);
     const { data, error: err } = await query;
     if (err) setError("تعذّر تحميل الملفات.");
     else {
